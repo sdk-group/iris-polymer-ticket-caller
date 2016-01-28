@@ -1,0 +1,62 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="iris-ticket-caller">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    tc
+    <iris-roomdisplay id="roomdisplay" call-queue="{{callQueue}}"></iris-roomdisplay>
+    <audio id="audio" src="{{ src }}" on-loadeddata="onCanPlay" on-ended="onMediaEnd"></audio>
+  </template>
+  <script>
+    'use strict'
+    Polymer({
+      is: 'iris-ticket-caller',
+      properties: {
+        ticket: {
+          type: Object
+        },
+        isPlaying: {
+          type: Boolean
+        }
+      },
+      observers: ['_callQueueUpdate(callQueue)'],
+      _callQueueUpdate(queue) {
+        if (queue.length) this.drainQueue();
+      },
+      drainQueue() {
+        console.log(this.callQueue.length);
+        if (this.isPlaying || !this.callQueue.length) return;
+        this.current = this.callQueue[0];
+        this.src = this.current.voice;
+        console.log(this.$.audio.readyState);
+        if (this.$.audio.readyState == 4) this.play();
+      },
+      onMediaEnd() {
+        if (this.current) this.$.roomdisplay.played(this.current).then(() => {
+          console.log('played!');
+          this.set('isPlaying', false);
+          this.drainQueue();
+        });
+
+      },
+      onCanPlay() {
+        console.log('can!');
+        this.play();
+      },
+      play() {
+        this.$.audio.play();
+        this.set('isPlaying', true);
+      },
+      ready() {},
+      call(to_play) {
+        let ticket = to_play.ticket;
+        let sound = to_play.sound;
+
+      }
+    });
+  </script>
+</dom-module>
