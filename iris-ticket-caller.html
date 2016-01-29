@@ -5,11 +5,56 @@
     <style>
       :host {
         display: block;
+        font-size: 72px;
+        width: 100%;
+      }
+      
+      iron-icon {
+        width: 60px;
+        height: 60px;
+        background-color: var(--mydoc-brown-400);
+        border-radius: 50%;
+        color: white;
+        margin-right: 20px;
+      }
+      
+      .labels > div {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+      
+      .labels > div > span {
+        display: flex;
+        align-items: center;
+        margin-right: 20px;
+      }
+      
+      span.label-text {
+        width: 250px;
+      }
+      
+      .client {
+        margin-bottom: 30px;
       }
     </style>
-    tc
-    <iris-roomdisplay id="roomdisplay" call-queue="{{callQueue}}"></iris-roomdisplay>
+
+    <iris-roomdisplay id="roomdisplay" ticket-to-play="{{ticket}}"></iris-roomdisplay>
     <audio id="audio" src="{{ src }}" on-loadeddata="onCanPlay" on-ended="onMediaEnd"></audio>
+    <div class="labels">
+
+      <div class="client">
+        <iron-icon icon="icons:chevron-right"></iron-icon>
+        <span class="label-text">Клиент</span>
+        <span>[[current.label]]</span>
+      </div>
+      <div class="operator">
+        <iron-icon icon="icons:chevron-right"></iron-icon>
+        <span class="label-text">Окно</span>
+        <span>[[current.operator.short_label]]</span>
+      </div>
+    </div>
+
   </template>
   <script>
     'use strict'
@@ -17,41 +62,34 @@
       is: 'iris-ticket-caller',
       properties: {
         ticket: {
-          type: Object
+          type: Object,
+          observer: 'ticketUpdate'
         },
         isPlaying: {
           type: Boolean
         }
       },
-      observers: ['_callQueueUpdate(callQueue)'],
-      _callQueueUpdate(queue) {
-        if (queue.length) this.drainQueue();
-      },
-      drainQueue() {
-        console.log(this.callQueue.length);
-        if (this.isPlaying || !this.callQueue.length) return;
-        this.current = this.callQueue[0];
-        this.src = this.current.voice;
-        console.log(this.$.audio.readyState);
+      ticketUpdate(ticket) {
+        if (!ticket) return;
+        console.log(ticket.id, ticket.order);
+        this.current = ticket;
+        this.src = ticket.voice;
         if (this.$.audio.readyState == 4) this.play();
       },
       onMediaEnd() {
-        if (this.current) this.$.roomdisplay.played(this.current).then(() => {
+        if (this.ticket) this.$.roomdisplay.played(this.ticket).then(() => {
           console.log('played!');
           this.set('isPlaying', false);
-          this.drainQueue();
         });
 
       },
       onCanPlay() {
-        console.log('can!');
         this.play();
       },
       play() {
         this.$.audio.play();
         this.set('isPlaying', true);
       },
-      ready() {},
       call(to_play) {
         let ticket = to_play.ticket;
         let sound = to_play.sound;
