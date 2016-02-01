@@ -5,7 +5,7 @@
     <style>
       :host {
         display: block;
-        font-size: 72px;
+        font-size: 42px;
         width: 100%;
       }
       
@@ -39,6 +39,7 @@
       }
     </style>
 
+    <iris-settings-access id="settings"></iris-settings-access>
     <iris-roomdisplay id="roomdisplay" ticket-to-play="{{ticket}}"></iris-roomdisplay>
     <audio id="audio" src="{{ src }}" on-loadeddata="onCanPlay" on-ended="onMediaEnd"></audio>
     <div class="labels">
@@ -71,10 +72,15 @@
       },
       ticketUpdate(ticket) {
         if (!ticket) return;
-        console.log(ticket.id, ticket.order);
+        console.log('ticket to play', ticket.id);
         this.current = ticket;
-        this.src = ticket.voice;
-        if (this.$.audio.readyState == 4) this.play();
+        let server = this.$.settings.getItem('api_server');
+        this.src = 'http://' + server + '/' + ticket.voice;
+        console.log(this.src);
+
+        if (this.$.audio.readyState == 4) {
+          this.play();
+        }
       },
       onMediaEnd() {
         if (this.ticket) this.$.roomdisplay.played(this.ticket).then(() => {
