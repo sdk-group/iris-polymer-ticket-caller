@@ -77,19 +77,34 @@
         let server = this.$.settings.getItem('api_server');
         this.src = 'http://' + server + '/' + ticket.voice;
         console.log(this.src);
-
+        this.stopCountdown();
         if (this.$.audio.readyState == 4) {
+          console.log('can play');
           this.play();
+        } else {
+          this.startCountdown(ticket.voice_duration)
         }
+      },
+      startCountdown(voice_duration) {
+        this.cd = setTimeout(() => this.onMediaFailed(), voice_duration)
+      },
+      stopCountdown() {
+        clearTimeout(this.cd);
+      },
+      onMediaFailed() {
+        if (this.ticket) this.$.roomdisplay.failed(this.ticket).then(() => {
+          console.log('failed!');
+          this.set('isPlaying', false);
+        });
       },
       onMediaEnd() {
         if (this.ticket) this.$.roomdisplay.played(this.ticket).then(() => {
           console.log('played!');
           this.set('isPlaying', false);
         });
-
       },
       onCanPlay() {
+        this.stopCountdown();
         this.play();
       },
       play() {
