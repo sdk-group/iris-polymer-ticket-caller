@@ -79,8 +79,8 @@
         console.log(this.src);
         this.debounce('voice-failed', () => this.onMediaFailed(), ticket.voice_duration);
         console.log('duration', ticket.voice_duration);
-
-        if (this.$.audio.readyState == 4) {
+        console.log('readyState', this.$.audio.readyState);
+        if (this.$.audio.readyState >= 2) {
           console.log('can play');
           this.play();
         }
