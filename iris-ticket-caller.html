@@ -71,25 +71,19 @@
         }
       },
       ticketUpdate(ticket) {
-        if (!ticket) return;
+        if (!ticket || !(ticket instanceof IRIS.Ticket)) return;
         console.log('ticket to play', ticket.id);
         this.current = ticket;
         let server = this.$.settings.getItem('api_server');
         this.src = 'http://' + server + '/' + ticket.voice;
         console.log(this.src);
-        this.stopCountdown();
+        this.debounce('voice-failed', () => this.onMediaFailed(), ticket.voice_duration);
+        console.log('duration', ticket.voice_duration);
+
         if (this.$.audio.readyState == 4) {
           console.log('can play');
           this.play();
-        } else {
-          this.startCountdown(ticket.voice_duration)
         }
-      },
-      startCountdown(voice_duration) {
-        this.cd = setTimeout(() => this.onMediaFailed(), voice_duration)
-      },
-      stopCountdown() {
-        clearTimeout(this.cd);
       },
       onMediaFailed() {
         if (this.ticket) this.$.roomdisplay.failed(this.ticket).then(() => {
@@ -104,10 +98,10 @@
         });
       },
       onCanPlay() {
-        this.stopCountdown();
         this.play();
       },
       play() {
+        this.cancelDebouncer('voice-failed');
         this.$.audio.play();
         this.set('isPlaying', true);
       },
