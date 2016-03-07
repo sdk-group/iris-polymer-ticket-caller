@@ -6,7 +6,6 @@
       :host {
         display: block;
         font-size: 42px;
-        width: 100%;
       }
       
       iron-icon {
@@ -21,17 +20,21 @@
       .labels > div {
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
         align-items: center;
       }
       
       .labels > div > span {
-        display: flex;
-        align-items: center;
         margin-right: 20px;
       }
       
-      span.label-text {
-        width: 250px;
+      span {
+        width: 200px;
+      }
+      
+      span.label {
+        min-height: 70px;
+        text-align: center;
       }
       
       .client {
@@ -43,16 +46,16 @@
     <iris-roomdisplay id="roomdisplay" ticket-to-play="{{ticket}}"></iris-roomdisplay>
     <audio id="audio" src="{{ src }}" on-loadeddata="onCanPlay" on-ended="onMediaEnd"></audio>
     <div class="labels">
-
       <div class="client">
         <iron-icon icon="icons:chevron-right"></iron-icon>
         <span class="label-text">Клиент</span>
-        <span>[[current.label]]</span>
+        <span class="label">[[current.label]]</span>
       </div>
+
       <div class="operator">
         <iron-icon icon="icons:chevron-right"></iron-icon>
         <span class="label-text">Окно</span>
-        <span>[[current.operator.short_label]]</span>
+        <span class="label">[[current.operator.short_label]]</span>
       </div>
     </div>
 
