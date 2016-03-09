@@ -40,6 +40,14 @@
       .client {
         margin-bottom: 30px;
       }
+      
+      .client-id {
+        color: var(--iris-ticket-caller-ticket-color, --default-primary-color);
+      }
+      
+      .operator-id {
+        color: var(--iris-ticket-caller-operator-color, --default-primary-color);
+      }
     </style>
 
     <iris-settings-access id="settings"></iris-settings-access>
@@ -47,15 +55,15 @@
     <audio id="audio" src="{{ src }}" on-loadeddata="onCanPlay" on-ended="onMediaEnd"></audio>
     <div class="labels">
       <div class="client">
-        <iron-icon icon="icons:chevron-right"></iron-icon>
+        <iron-icon icon="expand-more"></iron-icon>
         <span class="label-text">Клиент</span>
-        <span class="label">[[current.label]]</span>
+        <span class="label client-id">[[current.label]]</span>
       </div>
 
       <div class="operator">
-        <iron-icon icon="icons:chevron-right"></iron-icon>
+        <iron-icon icon="expand-more"></iron-icon>
         <span class="label-text">Окно</span>
-        <span class="label">[[current.operator.short_label]]</span>
+        <span class="label operator-id">[[current.operator.short_label]]</span>
       </div>
     </div>
 
@@ -71,6 +79,10 @@
         },
         isPlaying: {
           type: Boolean
+        },
+        orientation: {
+          type: String,
+          value: "horizontal"
         }
       },
       ticketUpdate(ticket) {
