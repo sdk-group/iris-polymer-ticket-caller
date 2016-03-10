@@ -19,22 +19,24 @@
       
       .labels > div {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         flex-wrap: wrap;
         align-items: center;
       }
       
       .labels > div > span {
-        margin-right: 20px;
+        margin: 0 auto;
+        text-align: center;
       }
       
       span {
-        width: 200px;
+        width: 300px;
       }
       
       span.label {
         min-height: 70px;
         text-align: center;
+        @apply(--iris-ticket-caller-labels);
       }
       
       .client {
@@ -47,6 +49,11 @@
       
       .operator-id {
         color: var(--iris-ticket-caller-operator-color, --default-primary-color);
+      }
+      
+      .labels[orientation="vertical"] {
+        display: flex;
+        flex-direction: column;
       }
     </style>
 
@@ -89,8 +96,13 @@
         if (!ticket || !(ticket instanceof IRIS.Ticket)) return;
         console.log('ticket to play', ticket.id);
         this.current = ticket;
-        let server = this.$.settings.getItem('api_server');
-        this.src = 'http://' + server + '/' + ticket.voice;
+        let server = this.$.settings.getItem('data_server');
+        if (!server) server = this.$.settings.getItem('api_server');
+
+        let port = this.$.settings.getItem('data_port');
+        let host = port ? server + ":" + port : server;
+
+        this.src = 'http://' + host + '/' + ticket.voice;
         console.log(this.src);
         this.debounce('voice-failed', () => this.onMediaFailed(), ticket.voice_duration);
         console.log('duration', ticket.voice_duration);
