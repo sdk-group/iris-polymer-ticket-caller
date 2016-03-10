@@ -53,18 +53,18 @@
     <iris-settings-access id="settings"></iris-settings-access>
     <iris-roomdisplay id="roomdisplay" ticket-to-play="{{ticket}}"></iris-roomdisplay>
     <audio id="audio" src="{{ src }}" on-loadeddata="onCanPlay" on-ended="onMediaEnd"></audio>
-    <div class="labels">
+    <div orientation$="{{orientation}}" class="labels">
+
       <div class="client">
-        <iron-icon icon="expand-more"></iron-icon>
-        <span class="label-text">Клиент</span>
+        <span class="label-text"><iron-icon icon="expand-more"></iron-icon>Клиент</span>
         <span class="label client-id">[[current.label]]</span>
       </div>
 
       <div class="operator">
-        <iron-icon icon="expand-more"></iron-icon>
-        <span class="label-text">Окно</span>
+        <span class="label-text"><iron-icon icon="expand-more"></iron-icon>Окно</span>
         <span class="label operator-id">[[current.operator.short_label]]</span>
       </div>
+
     </div>
 
   </template>
