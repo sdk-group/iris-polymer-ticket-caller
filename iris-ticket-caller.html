@@ -1,5 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="iris-ticket-voice.html">
+
 <dom-module id="iris-ticket-caller">
   <template>
     <style>
@@ -31,6 +33,7 @@
       
       span {
         width: 300px;
+        font-weight: bold;
       }
       
       span.label {
@@ -57,9 +60,10 @@
       }
     </style>
 
-    <iris-settings-access id="settings"></iris-settings-access>
-    <iris-roomdisplay id="roomdisplay" ticket-to-play="{{ticket}}"></iris-roomdisplay>
-    <audio id="audio" src="{{ src }}" on-loadeddata="onCanPlay" on-ended="onMediaEnd"></audio>
+    <iris-roomdisplay id="roomdisplay" ticket-to-play="{{ticket}}" silent-mode="{{silent}}"></iris-roomdisplay>
+
+    <iris-ticket-voice silent="[[silent]]" ticket="[[ticket]]" on-media-failed="onMediaFailed" on-media-played="onMediaEnd"></iris-ticket-voice>
+
     <div orientation$="{{orientation}}" class="labels">
 
       <div class="client">
@@ -69,7 +73,7 @@
 
       <div class="operator">
         <span class="label-text"><iron-icon icon="expand-more"></iron-icon>Окно</span>
-        <span class="label operator-id">[[current.operator.short_label]]</span>
+        <span class="label operator-id">[[current.workstation.short_label]]</span>
       </div>
 
     </div>
@@ -84,9 +88,6 @@
           type: Object,
           observer: 'ticketUpdate'
         },
-        isPlaying: {
-          type: Boolean
-        },
         orientation: {
           type: String,
           value: "horizontal"
@@ -94,23 +95,7 @@
       },
       ticketUpdate(ticket) {
         if (!ticket || !(ticket instanceof IRIS.Ticket)) return;
-        console.log('ticket to play', ticket.id);
         this.current = ticket;
-        let server = this.$.settings.getItem('data_server');
-        if (!server) server = this.$.settings.getItem('api_server');
-
-        let port = this.$.settings.getItem('data_port');
-        let host = port ? server + ":" + port : server;
-
-        this.src = 'http://' + host + '/' + ticket.voice;
-        console.log(this.src);
-        this.debounce('voice-failed', () => this.onMediaFailed(), ticket.voice_duration);
-        console.log('duration', ticket.voice_duration);
-        console.log('readyState', this.$.audio.readyState);
-        if (this.$.audio.readyState >= 2) {
-          console.log('can play');
-          this.play();
-        }
       },
       onMediaFailed() {
         if (this.ticket) this.$.roomdisplay.failed(this.ticket).then(() => {
@@ -123,19 +108,6 @@
           console.log('played!');
           this.set('isPlaying', false);
         });
-      },
-      onCanPlay() {
-        this.play();
-      },
-      play() {
-        this.cancelDebouncer('voice-failed');
-        this.$.audio.play();
-        this.set('isPlaying', true);
-      },
-      call(to_play) {
-        let ticket = to_play.ticket;
-        let sound = to_play.sound;
-
       }
     });
   </script>

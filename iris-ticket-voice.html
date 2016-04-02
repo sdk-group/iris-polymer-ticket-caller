@@ -1,0 +1,66 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="iris-ticket-voice">
+  <template>
+    <iris-settings-access id="settings"></iris-settings-access>
+    <audio id="audio" src="{{ src }}" on-loadeddata="onCanPlay" on-ended="played"></audio>
+  </template>
+  <script>
+    Polymer({
+      is: 'iris-ticket-voice',
+      properties: {
+        ticket: {
+          type: Object,
+          observer: 'ticketUpdate'
+        },
+        isPlaying: {
+          type: Boolean
+        },
+        silent: {
+          type: Boolean,
+          value: false
+        }
+      },
+      attached: function() {
+        this.style.display = 'none';
+      },
+      ticketUpdate(ticket) {
+        if (!ticket || !(ticket instanceof IRIS.Ticket)) return;
+        console.log('ticket to play', ticket.id);
+
+        if (this.silent) {
+          setTimeout(() => this.fire('media-played'), ticket.voice_duration);
+          return;
+        }
+
+        let data_server = this.$.settings.getItem('data_server');
+        let server = data_server ? data_server : this.$.settings.getItem('api_server');
+
+        let port = this.$.settings.getItem('data_port');
+        let host = port ? server + ":" + port : server;
+
+        this.src = 'http://' + host + '/' + ticket.voice;
+
+        this.debounce('voice-failed', () => this.fire('media-failed'), ticket.voice_duration);
+        console.log('duration', ticket.voice_duration);
+        console.log('readyState', this.$.audio.readyState);
+
+        if (this.$.audio.readyState >= 2) {
+          console.log('can play');
+          this.play();
+        }
+      },
+      played() {
+        this.fire('media-played')
+      },
+      onCanPlay() {
+        this.play();
+      },
+      play() {
+        this.cancelDebouncer('voice-failed');
+        this.$.audio.play();
+        this.set('isPlaying', true);
+      }
+    });
+  </script>
+</dom-module>
