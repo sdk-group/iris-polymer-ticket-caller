@@ -3,7 +3,7 @@
 <dom-module id="iris-ticket-voice">
   <template>
     <iris-settings-access id="settings"></iris-settings-access>
-    <audio id="audio" src="{{ src }}" on-loadeddata="onCanPlay" on-ended="played"></audio>
+    <audio id="audio" src="{{src}}" on-loadeddata="onCanPlay" on-ended="played"></audio>
   </template>
   <script>
     Polymer({
@@ -21,11 +21,12 @@
           value: false
         }
       },
-      attached: function() {
+      attached: function () {
         this.style.display = 'none';
       },
       ticketUpdate(ticket) {
-        if (!ticket || !(ticket instanceof IRIS.Ticket)) return;
+        if (!ticket || !(ticket instanceof IRIS.Ticket))
+          return;
         console.log('ticket to play', ticket.id);
 
         if (this.silent) {
@@ -34,10 +35,15 @@
         }
 
         let data_server = this.$.settings.getItem('data_server');
-        let server = data_server ? data_server : this.$.settings.getItem('api_server');
-
         let port = this.$.settings.getItem('data_port');
-        let host = port ? server + ":" + port : server;
+
+        let server = data_server
+          ? data_server
+          : this.$.settings.getItem('api_server');
+
+        let host = port
+          ? server + ":" + port
+          : server;
 
         this.src = 'http://' + host + '/' + ticket.voice;
 

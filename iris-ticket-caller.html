@@ -7,57 +7,58 @@
     <style>
       :host {
         display: block;
-        font-size: 42px;
+        font-size: var(--iris-ticket-caller-font-size, 42px);
       }
-      
+
       iron-icon {
-        width: 60px;
-        height: 60px;
+        width: var(--iris-ticket-caller-icon-size, 60px);
+        height: var(--iris-ticket-caller-icon-size, 60px);
         background-color: var(--mydoc-brown-400);
         border-radius: 50%;
         color: white;
         margin-right: 20px;
       }
-      
+
       .labels > div {
         display: flex;
         flex-direction: column;
         flex-wrap: wrap;
         align-items: center;
       }
-      
+
       .labels > div > span {
         margin: 0 auto;
         text-align: center;
       }
-      
+
       span {
-        width: 300px;
+        width: var(--iris-ticket-caller-span-width, 300px);
         font-weight: bold;
       }
-      
+
       span.label {
         min-height: 70px;
         text-align: center;
         @apply(--iris-ticket-caller-labels);
       }
-      
+
       .client {
         margin-bottom: 30px;
       }
-      
+
       .client-id {
         color: var(--iris-ticket-caller-ticket-color, --default-primary-color);
       }
-      
+
       .operator-id {
         color: var(--iris-ticket-caller-operator-color, --default-primary-color);
       }
-      
+
       .labels[orientation="vertical"] {
         display: flex;
         flex-direction: column;
       }
+
     </style>
 
     <iris-roomdisplay id="roomdisplay" ticket-to-play="{{ticket}}" silent-mode="{{silent}}"></iris-roomdisplay>
@@ -67,12 +68,14 @@
     <div orientation$="{{orientation}}" class="labels">
 
       <div class="client">
-        <span class="label-text"><iron-icon icon="expand-more"></iron-icon>Клиент</span>
-        <span class="label client-id">[[current.label]]</span>
+        <span class="label-text">
+          <iron-icon icon="expand-more"></iron-icon>Клиент</span>
+        <span class="label client-id">[[current.raw_label]]</span>
       </div>
 
       <div class="operator">
-        <span class="label-text"><iron-icon icon="expand-more"></iron-icon>Окно</span>
+        <span class="label-text">
+          <iron-icon icon="expand-more"></iron-icon>Окно</span>
         <span class="label operator-id">[[current.workstation.short_label]]</span>
       </div>
 
@@ -94,21 +97,25 @@
         }
       },
       ticketUpdate(ticket) {
-        if (!ticket || !(ticket instanceof IRIS.Ticket)) return;
+        if (!ticket || !(ticket instanceof IRIS.Ticket))
+          return;
         this.current = ticket;
       },
       onMediaFailed() {
-        if (this.ticket) this.$.roomdisplay.failed(this.ticket).then(() => {
-          console.log('failed!');
-          this.set('isPlaying', false);
-        });
-      },
+        if (this.ticket)
+          this.$.roomdisplay.failed(this.ticket).then(() => {
+            console.log('failed!');
+            this.set('isPlaying', false);
+          });
+        }
+      ,
       onMediaEnd() {
-        if (this.ticket) this.$.roomdisplay.played(this.ticket).then(() => {
-          console.log('played!');
-          this.set('isPlaying', false);
-        });
-      }
-    });
+        if (this.ticket)
+          this.$.roomdisplay.played(this.ticket).then(() => {
+            console.log('played!');
+            this.set('isPlaying', false);
+          });
+        }
+      });
   </script>
 </dom-module>
