@@ -37,14 +37,11 @@
       }
 
       span.label {
-        min-height: 70px;
         text-align: center;
         @apply(--iris-ticket-caller-labels);
       }
 
-      .client {
-        margin-bottom: 30px;
-      }
+      .client {}
 
       .client-id {
         color: var(--iris-ticket-caller-ticket-color, --default-primary-color);
@@ -97,25 +94,27 @@
         }
       },
       ticketUpdate(ticket) {
-        if (!ticket || !(ticket instanceof IRIS.Ticket))
-          return;
+        // if (!ticket || !(ticket instanceof IRIS.Ticket))   return;
         this.current = ticket;
       },
       onMediaFailed() {
-        if (this.ticket)
-          this.$.roomdisplay.failed(this.ticket).then(() => {
-            console.log('failed!');
-            this.set('isPlaying', false);
-          });
+        if (!this.ticket) {
+          return;
         }
-      ,
+        this.$.roomdisplay.failed(this.ticket).then(() => {
+          console.log('failed!');
+          this.set('isPlaying', false);
+        });
+      },
       onMediaEnd() {
-        if (this.ticket)
-          this.$.roomdisplay.played(this.ticket).then(() => {
-            console.log('played!');
-            this.set('isPlaying', false);
-          });
+        if (!this.ticket) {
+          return;
         }
-      });
+        this.$.roomdisplay.played(this.ticket).then(() => {
+          console.log('played!');
+          this.set('isPlaying', false);
+        });
+      }
+    });
   </script>
 </dom-module>
