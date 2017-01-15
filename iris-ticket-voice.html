@@ -45,12 +45,19 @@
           ? server + ":" + port
           : server;
 
+        let voice_directive_timer = this.$.settings.getItem('voice_directive_timer') || 0;
         this.src = 'http://' + host + '/' + ticket.voice;
 
-        this.debounce('voice-failed', () => this.fire('media-failed'), ticket.voice_duration);
         console.log('duration', ticket.voice_duration);
         console.log('readyState', this.$.audio.readyState);
 
+        if (!!voice_directive_timer) {
+          console.log('will play in %s msec', voice_directive_timer);
+          this.reserve_timer = setTimeout(() => this.play(), voice_directive_timer);
+          return;
+        }
+
+        this.debounce('voice-failed', () => this.fire('media-failed'), ticket.voice_duration);
         if (this.$.audio.readyState >= 2) {
           console.log('can play');
           this.play();
@@ -60,9 +67,14 @@
         this.fire('media-played')
       },
       onCanPlay() {
+        let voice_directive_timer = this.$.settings.getItem('voice_directive_timer') || 0;
+        if (voice_directive_timer)
+          return;
+
         this.play();
       },
       play() {
+        !!this.reserve_timer && clearTimeout(this.reserve_timer);
         this.cancelDebouncer('voice-failed');
         this.$.audio.play();
         this.set('isPlaying', true);
